@@ -11,7 +11,7 @@ import { MongoClient } from 'mongodb'
 import ShortUniqueId from 'short-unique-id'
 import dotenv from 'dotenv'
 import { userModel } from '../models/user.js'
-import { chainForWebURL, vectorStoreForWebURL } from '../setup.js'
+import { vectorStoreForWebURL } from '../setup.js'
 dotenv.config()
 
 async function getCollection (client) {
@@ -110,7 +110,7 @@ export async function getAnswers (req, res) {
     })
 
     const prompt = ChatPromptTemplate.fromTemplate(`
-        Answer the user's question from the given context in very detailed form. If user asks question which is not connected to the given context, then simply dont respond to that question. Make sure the output must be in markdown format, you will get penalty if you dont respond in markdown format.   
+        Answer the user's question from the given context in very detailed form. If user asks question which is not connected to the given context, then simply dont respond to that question. Do not repeat the question of user in the output response or do not re-write the user's question in output, if you repeat the user's question as heading in output then you will get penalty. Make sure the output must be in markdown format, you will get penalty if you dont respond in markdown format.   
         Context: {context}
         Question: {input}
     `)

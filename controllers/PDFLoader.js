@@ -10,8 +10,11 @@ import { MongoDBAtlasVectorSearch } from '@langchain/mongodb'
 import { MongoClient } from 'mongodb'
 import ShortUniqueId from 'short-unique-id'
 import { userModel } from '../models/user.js'
-import { chainForDocs, vectorStoreForDocs } from '../setup.js'
+import { vectorStoreForDocs } from '../setup.js'
 import dotenv from 'dotenv'
+import fs from 'fs'
+import { promisify } from 'util'
+import path from 'path'
 dotenv.config()
 
 async function getCollection (client) {
@@ -26,8 +29,6 @@ async function getCollection (client) {
 export async function setPdf (req, res) {
     if (!req.file) return res.status(400).json({ msg: 'No file was found', code: 0 })
     if (!req.query.userId) return res.status(400).json({ msg: 'No user ID was found', code: 0 })
-
-    console.log('we in')
 
     const client = new MongoClient(process.env.MONGODB_ATLAS_URI)    
     const collection = await getCollection(client)
@@ -87,6 +88,15 @@ export async function setPdf (req, res) {
         return json.status(501).json({ msg: err, code: 0 })
     } finally {
         await client.close()
+        try {
+            const filePath = path.join(process.cwd(), req.file.path)
+            console.log(filePath)
+            const unlinkAsync = promisify(fs.unlink)
+            await unlinkAsync(filePath)
+            console.log(`Successfully deleted ${req.file.path}`)
+        } catch (unlinkError) {
+            console.error(`Error deleting file ${req.file.path}:`, unlinkError)
+        }
     }
 }
 
@@ -107,7 +117,7 @@ export async function getAnswers (req, res) {
     })
 
     const prompt = ChatPromptTemplate.fromTemplate(`
-        Answer the user's question from the given context in very detailed form. If user asks question which is not connected to the given context, then simply dont respond to that question. Make sure the output must be in markdown format, you will get penalty if you dont respond in markdown format.   
+        Answer the user's question from the given context in very detailed form. If user asks question which is not connected to the given context, then simply dont respond to that question. Do not repeat the question of user in the output response or do not re-write the user's question in output, if you repeat the user's question as heading in output then you will get penalty. Make sure the output must be in markdown format, you will get penalty if you dont respond in markdown format.   
         Context: {context}
         Question: {input}
     `)
@@ -130,32 +140,3 @@ export async function getAnswers (req, res) {
         return res.status(501).json({ msg: err, code: 0 });
     } 
 }
-
-// export async function deleteDocVector (req, res) {
-//     if (!req.body.userId) return res.status(400).json({ msg: 'No user ID was found', code: 0 })
-//     if (!req.body.ids) return res.status(400).json({ msg: 'No ids were found', code: 0 })
-
-//     const client = new MongoClient(process.env.MONGODB_ATLAS_URI)    
-//     const collection = await getCollection(client, req.body.userId)
-
-//     const embeddingModel = new GoogleGenerativeAIEmbeddings({
-//         apiKey: process.env.GOOGLE_API_KEY, 
-//         model: 'text-embedding-004', 
-//         taskType: TaskType.RETRIEVAL_DOCUMENT 
-//     })
-
-//     const vectorStore = new MongoDBAtlasVectorSearch(embeddingModel, {
-//         collection: collection,
-//         indexName: 'vector_index',
-//         textKey: 'text',
-//         embeddingKey: 'embedding'
-//     })
-
-//     try {
-//         await vectorStore.delete({ ids: req.body.ids })
-//         return res.status(200).json({ msg: 'Successfully deleted document', code: 1 })
-//     } catch(err) {
-//         console.log(err)
-//         return res.status(501).json({ msg: err, code: 0 })
-//     }
-// }

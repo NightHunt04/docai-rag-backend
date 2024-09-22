@@ -1,6 +1,6 @@
-import { ChatGroq } from '@langchain/groq'
-import { ChatPromptTemplate } from '@langchain/core/prompts'
-import { createStuffDocumentsChain } from 'langchain/chains/combine_documents'
+// import { ChatGroq } from '@langchain/groq'
+// import { ChatPromptTemplate } from '@langchain/core/prompts'
+// import { createStuffDocumentsChain } from 'langchain/chains/combine_documents'
 import { GoogleGenerativeAIEmbeddings } from '@langchain/google-genai'
 import { TaskType } from '@google/generative-ai'
 import { MongoDBAtlasVectorSearch } from '@langchain/mongodb'
@@ -45,22 +45,22 @@ async function initializeForWebURL() {
         filterPath: 'metadata.userId'
     })
 
-    const model = new ChatGroq({
-        modelName: 'llama3-8b-8192',
-        apiKey: process.env.GROQ_API_KEY,
-        temperature: 0.7
-    })
+    // const model = new ChatGroq({
+    //     modelName: 'llama3-8b-8192',
+    //     apiKey: process.env.GROQ_API_KEY,
+    //     temperature: 0.7
+    // })
 
-    const prompt = ChatPromptTemplate.fromTemplate(`
-        Answer the user's question from the given context in very detailed form. If user asks question which is not connected to the given context, then simply dont respond to that question.    
-        Context: {context}
-        Question: {input}
-    `)
+    // const prompt = ChatPromptTemplate.fromTemplate(`
+    //     Answer the user's question from the given context in very detailed form. If user asks question which is not connected to the given context, then simply dont respond to that question.    
+    //     Context: {context}
+    //     Question: {input}
+    // `)
 
-    chainForWebURL = await createStuffDocumentsChain({
-        llm: model,
-        prompt
-    })
+    // chainForWebURL = await createStuffDocumentsChain({
+    //     llm: model,
+    //     prompt
+    // })
 }
 
 async function initializeForDoc() {
@@ -81,23 +81,23 @@ async function initializeForDoc() {
         filterPath: 'metadata.userId'
     })
 
-    const model = new ChatGroq({
-        modelName: 'llama3-8b-8192',
-        apiKey: process.env.GROQ_API_KEY,
-        temperature: 0.7
-    })
+    // const model = new ChatGroq({
+    //     modelName: 'llama3-8b-8192',
+    //     apiKey: process.env.GROQ_API_KEY,
+    //     temperature: 0.7
+    // })
 
-    const prompt = ChatPromptTemplate.fromTemplate(`
-        Answer the user's question from the given context in very detailed form. If user asks question which is not connected to the given context, then simply dont respond to that question.    
-        Context: {context}
-        Question: {input}
-    `)
+    // const prompt = ChatPromptTemplate.fromTemplate(`
+    //     Answer the user's question from the given context in very detailed form. If user asks question which is not connected to the given context, then simply dont respond to that question.    
+    //     Context: {context}
+    //     Question: {input}
+    // `)
 
-    chainForDocs = await createStuffDocumentsChain({
-        llm: model,
-        prompt
-    })
+    // chainForDocs = await createStuffDocumentsChain({
+    //     llm: model,
+    //     prompt
+    // })
 }
 
 
-export { chainForWebURL, vectorStoreForWebURL, initializeForDoc, initializeForWebURL, chainForDocs, vectorStoreForDocs }
+export { vectorStoreForWebURL, initializeForDoc, initializeForWebURL, vectorStoreForDocs }
