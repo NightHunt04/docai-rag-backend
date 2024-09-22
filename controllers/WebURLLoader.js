@@ -110,7 +110,7 @@ export async function getAnswers (req, res) {
     })
 
     const prompt = ChatPromptTemplate.fromTemplate(`
-        Answer the user's question from the given context in very detailed form. If user asks question which is not connected to the given context, then simply dont respond to that question.    
+        Answer the user's question from the given context in very detailed form. If user asks question which is not connected to the given context, then simply dont respond to that question. Make sure the output must be in markdown format, you will get penalty if you dont respond in markdown format.   
         Context: {context}
         Question: {input}
     `)
